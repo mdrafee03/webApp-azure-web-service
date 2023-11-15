@@ -5,33 +5,32 @@ using webapp.Models;
 
 namespace webapp.Services
 {
-	public class ProductService
-	{
-		public static string server = "rafee-db-server.database.windows.net";
-		public static string user = "rafeeadmin";
-		public static string password = "S3v3nP3@ks";
-		public static string database = "rafee-sql-db";
+    public interface IProductService
+    {
+        List<Product> GetProducts();
+    }
+    public class ProductService : IProductService
+    {
+        private readonly IConfiguration _configuration;
+        public ProductService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
-		private SqlConnection GetConnection()
-		{
-			var _builder = new SqlConnectionStringBuilder();
-			_builder.DataSource = server;
-			_builder.UserID = user;
-			_builder.Password = password;
-			_builder.InitialCatalog = database;
+        private SqlConnection GetConnection()
+        {
+            return new SqlConnection(_configuration.GetConnectionString("SQLConnection"));
+        }
 
-			return new SqlConnection(_builder.ConnectionString);
-		}
+        public List<Product> GetProducts()
+        {
+            SqlConnection conn = GetConnection();
+            List<Product> _productList = new();
+            string statement = "SELECT * from Products";
 
-		public List<Product> GetProducts()
-		{
-			SqlConnection conn = GetConnection();
-			List<Product> _productList = new();
-			string statement = "SELECT * from Products";
+            conn.Open();
 
-			conn.Open();
-
-			SqlCommand cmd = new SqlCommand(statement, conn);
+            SqlCommand cmd = new SqlCommand(statement, conn);
             using (SqlDataReader _reader = cmd.ExecuteReader())
             {
                 while (_reader.Read())
@@ -49,6 +48,6 @@ namespace webapp.Services
             conn.Close();
             return _productList;
         }
-	}
+    }
 }
 

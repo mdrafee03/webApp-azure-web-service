@@ -8,11 +8,16 @@ namespace webapp.Pages;
 public class IndexModel : PageModel
 {
     public required List<Product> Products { get; set; }
+    public readonly IProductService _productService;
+
+    public IndexModel(IProductService productService)
+    {
+        _productService = productService;
+    }
 
     public void OnGet()
     {
-        ProductService productService = new();
-        Products = productService.GetProducts();
+        Products = _productService.GetProducts();
 
     }
 }
