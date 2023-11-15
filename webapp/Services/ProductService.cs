@@ -12,9 +12,13 @@ namespace webapp.Services
     public class ProductService : IProductService
     {
         private readonly IConfiguration _configuration;
-        public ProductService(IConfiguration configuration)
+
+        private readonly ILogger<IProductService> _logger;
+
+        public ProductService(IConfiguration configuration, ILogger<IProductService> logger)
         {
             _configuration = configuration;
+            _logger = logger;
         }
 
         private SqlConnection GetConnection()
@@ -25,10 +29,12 @@ namespace webapp.Services
         public List<Product> GetProducts()
         {
             SqlConnection conn = GetConnection();
+
             List<Product> _productList = new();
             string statement = "SELECT * from Products";
 
             conn.Open();
+            _logger.LogInformation("Connection is open");
 
             SqlCommand cmd = new SqlCommand(statement, conn);
             using (SqlDataReader _reader = cmd.ExecuteReader())
@@ -46,6 +52,7 @@ namespace webapp.Services
                 }
             }
             conn.Close();
+            _logger.LogInformation($"product count: {3}");
             return _productList;
         }
     }
